@@ -276,6 +276,30 @@ a:active {
 			else if(obj.id == "get_mic"){
 				cmd.type = 26;
 			}
+			else if(obj.id == "aud_start"){
+				cmd.type = 29;
+				cmd.data_len = 4 + 4 + 256 + 256;
+				var buffer = new ArrayBuffer(cmd.data_len);
+				var mic_name_len = new Uint32Array(buffer, 0, 1);
+				var micSel = document.getElementById("mics");
+				var index = micSel.selectedIndex; // 选中索引
+				var sel_mic_name = micSel.options[index].text; // 选中文本
+				mic_name_len[0] = sel_mic_name.length;
+				var urlname_len = new Uint32Array(buffer, 4, 1);
+				urlname_len[0] = 0;
+				var mic_name = new Uint8Array(buffer, 8, 256);
+				var mic_name_array = new TextEncoder("utf-8").encode(sel_mic_name);
+				for(var i=0;i< mic_name_array.length; i++){
+				   mic_name[i] = mic_name_array[i];
+				}
+				var url_name = new Uint8Array(buffer, 8 + 256, 256);//todo: set push url
+				cmd.data = new Uint8Array(buffer, 0, cmd.data_len);
+				doSendWSCmd(cmd);
+				return;
+			}
+			else if(obj.id == "aud_stop"){
+				cmd.type = 30;
+			}
 			else if(obj.id == "get_cam"){
 				cmd.type = 41;
 			}
