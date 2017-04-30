@@ -140,6 +140,7 @@ a:active {
 		var url = "";
 		var output;
 		var wsState = "idle";
+		var websocket;
 		
 		  function testWebSocket()
   {
@@ -162,7 +163,7 @@ a:active {
     writeToScreen("DISCONNECTED");
 	wsState = "idle";
   }
-
+  
   function onMessage(evt)
   {
  	if(typeof(evt.data)=="string"){ 
@@ -172,44 +173,91 @@ a:active {
 		writeToScreen('<span style="color: blue;">receive binary</span>');
 		var reader = new FileReader(); 
 		reader.onload = function(evt){ 
-		if(evt.target.readyState == FileReader.DONE){ 
+			if(evt.target.readyState == FileReader.DONE){ 
+				var dv = new DataView(evt.target.result); 
+				writeToScreen('<span style="color: blue;">receive string ' + dv.byteLength +'</span>');
+				var result = dv.getUint16(0, true);
+				var byte_order = dv.getUint8(2, true);
+				var data_len = dv.getUint32(4, true);
 
-		var buffer = evt.target.result; 
-
-		writeToScreen('<span style="color: blue;">receive string ' + buffer.byteLength +'</span>');
-		var result = new Uint16Array(buffer, 0, 1);
-	    var byte_order = new Uint8Array(buffer, 2, 1);
-	    var data_len = new Uint32Array(buffer, 4, 1);
-	    var data = new Uint8Array(buffer, 8, buffer.byteLength - 8);
-		var data_sting =  new TextDecoder("utf-8").decode(data)
-        writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
-		} 
-		} 
+				if(result == 83){
+					if(data_len > 4){
+						var cam_num = dv.getUint32(8, true);
+						var offset = 12;
+						for(var i=0;i<cam_num; i++){
+							var cam_name_len = dv.getUint32(offset, true);
+							offset += 4;
+							var cam_name = new Uint8Array(evt.target.result, offset , cam_name_len - 1);
+							offset += cam_name_len;
+							var data_sting =  new TextDecoder("utf-8").decode(cam_name);
+							writeToScreen('<span style="color: blue;">Camera: ' + i + " " + data_sting + ' </span>');
+						}
+					}
+				} 
+				else{
+					var data_sting =  new TextDecoder("utf-8").decode(data);
+					writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
+				}
+			}
+		}
 		reader.readAsArrayBuffer(evt.data); 
 	}
-    websocket.close();
-  }
+   }
 
   function onError(evt)
   {
     writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
   }
 
-  function doSend(message)
+  function doSendWSCmd(wsCmd)
   {
-    writeToScreen("SENT: " + message);
-	var cmd_type = 54;//get mic volume
-	var cmd_buf_len = 2 + 1*2 + 4;
+    writeToScreen("SENT: " + wsCmd.name);
+
+	var cmd_buf_len = 2 + 1*2 + 4 + wsCmd.data_len;
 	var buffer = new ArrayBuffer(cmd_buf_len);
 	var cmd = new Uint16Array(buffer, 0, 1);
 	var byte_order = new Uint8Array(buffer, 2, 1);
 	var data_len = new Uint32Array(buffer, 4, 1);
-	cmd[0] = cmd_type;
-	byte_order[0] = 0;
-	data_len[0] = 0;
 	
+	cmd[0] = wsCmd.type;
+	byte_order[0] = 0;
+	data_len[0] = wsCmd.data_len;
+/*
+	var byteBuffer = new Uint8Array(buffer);
+	var dv = new DataView(buffer);
+	
+	dv.setUint16(0, wsCmd.type);
+	dv.setUint8(2, 1);
+	dv.setUint32(1, wsCmd.data_len);*/
+	
+	if(wsCmd.data_len > 0){
+		var data_buf = new Uint8Array(buffer, 8, wsCmd.data_len);
+		for(var i=0;i< wsCmd.data_len; i++){
+			data_buf[i] = wsCmd.data[i];
+		}
+	}
+
     websocket.send(buffer);
   }
+  
+  	function onTestClick(obj)
+	{
+			writeToScreen(obj.id);
+			var cmd = new Object();
+			cmd.data_len = 0;
+			cmd.data = "";
+			cmd.name = obj.id;
+			if(obj.id == "ss_start"){
+				cmd.type = 6;
+			}
+			else if(obj.id == "ss_stop"){
+			    cmd.type = 7;
+			}
+			else if(obj.id == "get_cam"){
+				cmd.type = 41;
+			}
+			doSendWSCmd(cmd);
+	}
 
   function writeToScreen(message)
   {
@@ -265,7 +313,7 @@ a:active {
 			queryParameters['idx'] = getUrlParam('idx');
 
 			if( queryParameters['source'] == "" )
-				queryParameters['source'] = "rtmp://localhost/vod/mp4:sample1_500kbps.f4v";
+				queryParameters['source'] = "rtmp://localhost/live/ss";
 			
 			if( queryParameters['type'] == "" )
 				queryParameters['type'] = "recorded";
@@ -378,7 +426,7 @@ a:active {
 		{
 			output.innerHTML = "";
 		}
-
+		
 		initialise();
 
     </script>
@@ -444,127 +492,69 @@ a:active {
                                   <td width="359" height="186" background="images/upperright_03.gif"><table width="358" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
                                       <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td width="323"><span class="style75">SELECT A VIDEO FROM THE LIST BELOW</span></td>
+                                      <td width="323"><span class="style75">click on following buttons to test liveserver method</span></td>
                                     </tr>
                                     <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td><span class="style75">SOURCE: /applications/vod/media</span></td>
+									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+                                      <td colspan="3"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
                                     </tr>
                                     <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel1"><span class="style74">&gt;</span></td>
-                                      <td id="td1" class="style76"><a href="demo.html?source=rtmp://localhost/vod/mp4:sample1_150kbps.f4v&type=recorded&idx=1">sample1_150kbps.f4v</a></td>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="ss_stop" onclick="javascript:onTestClick(this);">ss_stop</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="15" height="5" /></td>
-                                      <td id="sel2"><span class="style74">&gt;</span></td>
-                                      <td class="style76" id="td2"> <a href="demo.html?source=rtmp://localhost/vod/mp4:sample1_500kbps.f4v&type=recorded&idx=2">sample1_500kbps.f4v</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="ds_start" onclick="javascript:onTestClick(this);">ds_start</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel3"><span class="style74">&gt;</span></td>
-                                      <td id="td3" class="style76"><a href="demo.html?source=rtmp://localhost/vod/mp4:sample1_700kbps.f4v&type=recorded&idx=3">sample1_700kbps.f4v</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="ds_stop" onclick="javascript:onTestClick(this);">ds_stop</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel4"><span class="style74">&gt;</span></td>
-                                      <td id="td4" class="style76"><a href="demo.html?source=rtmp://localhost/vod/mp4:sample1_1000kbps.f4v&type=recorded&idx=4">sample1_1000kbps.f4v</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="get_mic" onclick="javascript:onTestClick(this);">get_mic</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel5"><span class="style74">&gt;</span></td>
-                                      <td id="td5" class="style76"><a href="demo.html?source=rtmp://localhost/vod/mp4:sample1_1500kbps.f4v&type=recorded&idx=5">sample1_1500kbps.f4v</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="3"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel6"><span class="style74">&gt;</span></td>
-                                      <td id="td6" class="style76"><a href="demo.html?source=rtmp://localhost/vod/sample&type=recorded&idx=6">sample.flv</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="aud_stop" onclick="javascript:onTestClick(this);">aud_stop</button></td>
                                     </tr>
-                                  </table></td>
-                                </tr>
-                                <tr>
-                                  <td width="359" height="114" background="images/middleright_05.gif"><table width="358" border="0" cellspacing="0" cellpadding="0">
-								    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td width="323" class="style75">SOURCE: /webroot/vod</td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-							   <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel7"><span class="style74">&gt;</span></td>
-                                      <td id="td7" class="style76"><a href="demo.html?source=hds_sample1_manifest.f4m&type=recorded&idx=7" title="Only works when viewed from localhost.">hds_sample1_manifest.f4m</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                    </tr><tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel8"><span class="style74">&gt;</span></td>
-                                      <td id="td8" class="style76"><a href="demo.html?source=rtmp_sample1_manifest.f4m&type=recorded&idx=8" title="Only works when viewed from localhost.">rtmp_sample1_manifest.f4m</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="get_cam" onclick="javascript:onTestClick(this);">get_cam</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel9"><span class="style74">&gt;</span></td>
-                                      <td id="td9" class="style76"><a href="demo.html?source=http://localhost/vod/sample2_1000kbps.f4v&type=recorded&idx=9">sample2_1000kbps.f4v (http progressive)</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel10"><span class="style74">&gt;</span></td>
-                                      <td id="td10" class="style76"><a href="demo.html?source=rtmp://localhost/vod/mp4:sample2_1000kbps.f4v&type=recorded&idx=10">sample2_1000kbps.f4v (rtmp)</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
                                     </tr>
-
-
-                                  </table></td>
-                                </tr>
-                                <tr>
-                                  <td width="359" height="77" background="images/lowerright_07.gif"><table width="358" border="0" cellspacing="0" cellpadding="0">
-
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td width="322" class="style75">SOURCE: /applications/live</td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
                                     </tr>
-                                    <tr>
-                                      <td colspan="2"><img src="images/spacer.gif" width="20" height="5" /></td>
-                                      </tr>
-                                    <tr>
-                                      <td><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td id="sel11"><span class="style74">&gt;</span></td>
-                                      <td id="td11" class="style76"><a href="demo.html?source=rtmp://localhost/live/livestream&type=live&idx=11">livestream</a></td>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
                                     </tr>
                                   </table></td>
                                 </tr>
-                              </table></td>
+                              </td>
                             </tr>
+							</tr>
                           </table></td>
                         </tr>
                     </table></td>
@@ -572,8 +562,7 @@ a:active {
                   </tr>
                 </table></td>
               </tr>
-              
-          </table></td>
+           </table></td>
         </tr>
       </table></td>
    </tr>
@@ -608,21 +597,6 @@ a:active {
                   <td width="42%" align="left"><table width="100" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                       <td width="5%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
-                      <td width="7%" align="left"><table width="0" >
-                          <tr>
-                            <td align="left"><div align="center">
-                                <input type="checkbox" name="checkbox" id="vodCheckbox" checked onclick="checkbox('vod');" />
-                            </div></td>
-                          </tr>
-                      </table></td>
-                      <td width="2%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
-                      <td width="6%" align="left"><div align="center"><span class="style31">VOD</span></div></td>
-                      <td width="5%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
-                      <td width="5%" align="left"><div align="center">
-                          <input type="checkbox" name="checkbox2" id="liveCheckbox" onclick="checkbox('live');" />
-                      </div></td>
-                      <td width="2%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
-                      <td width="6%" align="left"><span class="style31">LIVE</span></td>
                       <td width="5%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
                       <td width="27%" align="left"><a id="playBtn" onclick="javascript:playStream();"><img src="images/playstream_10.gif" width="104" height="25" /></a></td>
                       <td align="left">&nbsp;</td>
