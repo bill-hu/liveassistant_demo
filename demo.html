@@ -267,7 +267,14 @@ a:active {
 			cmd.data_len = 0;
 			cmd.data = "";
 			cmd.name = obj.id;
-			if(obj.id == "ss_start"){
+			
+			if(obj.id == "mov_start"){
+				cmd.type = 1;
+			}
+			else if(obj.id == "mov_stop"){
+				cmd.type = 2;
+			}
+			else if(obj.id == "ss_start"){
 				cmd.type = 6;
 			}
 			else if(obj.id == "ss_stop"){
