@@ -193,7 +193,21 @@ a:active {
 							writeToScreen('<span style="color: blue;">Camera: ' + i + " " + data_sting + ' </span>');
 						}
 					}
-				} 
+				}
+				else if(53 == result){
+					if(data_len > 4){
+						var mic_num = dv.getUint32(8, true);
+						var offset = 12;
+						for(var i=0;i<mic_num; i++){
+							var mic_name_len = dv.getUint32(offset, true);
+							offset += 4;
+							var mic_name = new Uint8Array(evt.target.result, offset , mic_name_len - 1);
+							offset += mic_name_len;
+							var data_sting =  new TextDecoder("utf-8").decode(mic_name);
+							writeToScreen('<span style="color: blue;">MIC: ' + i + " " + data_sting + ' </span>');
+						}
+					}
+				}
 				else{
 					var data_sting =  new TextDecoder("utf-8").decode(data);
 					writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
@@ -222,13 +236,6 @@ a:active {
 	cmd[0] = wsCmd.type;
 	byte_order[0] = 0;
 	data_len[0] = wsCmd.data_len;
-/*
-	var byteBuffer = new Uint8Array(buffer);
-	var dv = new DataView(buffer);
-	
-	dv.setUint16(0, wsCmd.type);
-	dv.setUint8(2, 1);
-	dv.setUint32(1, wsCmd.data_len);*/
 	
 	if(wsCmd.data_len > 0){
 		var data_buf = new Uint8Array(buffer, 8, wsCmd.data_len);
@@ -252,6 +259,9 @@ a:active {
 			}
 			else if(obj.id == "ss_stop"){
 			    cmd.type = 7;
+			}
+			else if(obj.id == "get_mic"){
+				cmd.type = 26;
 			}
 			else if(obj.id == "get_cam"){
 				cmd.type = 41;
