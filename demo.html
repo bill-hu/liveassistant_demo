@@ -184,13 +184,20 @@ a:active {
 					if(data_len > 4){
 						var cam_num = dv.getUint32(8, true);
 						var offset = 12;
+						var camSel = document.getElementById("cameras");
+						camSel.options.length = 0;
 						for(var i=0;i<cam_num; i++){
 							var cam_name_len = dv.getUint32(offset, true);
 							offset += 4;
 							var cam_name = new Uint8Array(evt.target.result, offset , cam_name_len - 1);
 							offset += cam_name_len;
 							var data_sting =  new TextDecoder("utf-8").decode(cam_name);
+
 							writeToScreen('<span style="color: blue;">Camera: ' + i + " " + data_sting + ' </span>');
+							var op = document.createElement("option");
+							op.value = i;
+							op.text = data_sting;
+							camSel.add(op);
 						}
 					}
 				}
@@ -543,6 +550,9 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="get_cam" onclick="javascript:onTestClick(this);">get_cam</button></td>
+									 <td width="300" ><img src="images/spacer.gif" width="20" height="10" />
+									 <select width = "300" id="cameras" name="cameras" />
+									 </td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
