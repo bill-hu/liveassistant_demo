@@ -205,6 +205,8 @@ a:active {
 					if(data_len > 4){
 						var mic_num = dv.getUint32(8, true);
 						var offset = 12;
+						var micSel = document.getElementById("mics");
+						micSel.options.length = 0;
 						for(var i=0;i<mic_num; i++){
 							var mic_name_len = dv.getUint32(offset, true);
 							offset += 4;
@@ -212,6 +214,10 @@ a:active {
 							offset += mic_name_len;
 							var data_sting =  new TextDecoder("utf-8").decode(mic_name);
 							writeToScreen('<span style="color: blue;">MIC: ' + i + " " + data_sting + ' </span>');
+							var op = document.createElement("option");
+							op.value = i;
+							op.text = data_sting;
+							micSel.add(op);
 						}
 					}
 				}
@@ -272,6 +278,30 @@ a:active {
 			}
 			else if(obj.id == "get_cam"){
 				cmd.type = 41;
+			}
+			else if(obj.id == "cam_start"){
+				cmd.type = 42;
+				cmd.data_len = 4 + 4 + 256 + 256;
+				var buffer = new ArrayBuffer(cmd.data_len);
+				var cam_name_len = new Uint32Array(buffer, 0, 1);
+				var camSel = document.getElementById("cameras");
+				var index = camSel.selectedIndex; // 选中索引
+				var sel_cam_name = camSel.options[index].text; // 选中文本
+				cam_name_len[0] = sel_cam_name.length;
+				var urlname_len = new Uint32Array(buffer, 4, 1);
+				urlname_len[0] = 0;
+				var cam_name = new Uint8Array(buffer, 8, 256);
+				var cam_name_array = new TextEncoder("utf-8").encode(sel_cam_name);
+				for(var i=0;i< cam_name_array.length; i++){
+				   cam_name[i] = cam_name_array[i];
+				}
+				var url_name = new Uint8Array(buffer, 8 + 256, 256);//todo: set push url
+				cmd.data = new Uint8Array(buffer, 0, cmd.data_len);
+				doSendWSCmd(cmd);
+				return;
+			}
+			else if(obj.id == "cam_stop"){
+				cmd.type = 43;
 			}
 			doSendWSCmd(cmd);
 	}
@@ -530,6 +560,8 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="get_mic" onclick="javascript:onTestClick(this);">get_mic</button></td>
+									  <td width="300" ><img src="images/spacer.gif" width="20" height="10" />
+									 <select width = "300" id="mics" name="mics" /></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
