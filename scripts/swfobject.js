@@ -30,6 +30,7 @@ var swfobject = function() {
 		dynamicStylesheet,
 		dynamicStylesheetMedia,
 		autoHideShow = true,
+		needRebuild = false,
 	
 	/* Centralized function for browser feature detection
 		- User agent string detection is only used when no good alternative is possible
@@ -137,6 +138,11 @@ var swfobject = function() {
 	}
 	
 	function addDomLoadEvent(fn) {
+		if(needRebuild){
+			isDomLoaded = false;
+			fn();
+			return;
+		}
 		if (isDomLoaded) {
 			fn();
 		}
@@ -474,6 +480,7 @@ var swfobject = function() {
 	function removeSWF(id) {
 		var obj = getElementById(id);
 		if (obj && obj.nodeName == "OBJECT") {
+			needRebuild = true;
 			if (ua.ie && ua.win) {
 				obj.style.display = "none";
 				(function(){

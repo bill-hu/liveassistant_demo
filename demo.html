@@ -141,8 +141,10 @@ a:active {
 		var output;
 		var wsState = "idle";
 		var websocket;
+		var initload = true;
+		var player;
 		
-		  function testWebSocket()
+  function testWebSocket()
   {
     websocket = new WebSocket(wsUri);
     websocket.onopen = function(evt) { onOpen(evt) };
@@ -180,7 +182,7 @@ a:active {
 				var byte_order = dv.getUint8(2, true);
 				var data_len = dv.getUint32(4, true);
 
-				if(result == 83){
+				if(result == 83){//get camera sucess
 					if(data_len > 4){
 						var cam_num = dv.getUint32(8, true);
 						var offset = 12;
@@ -201,7 +203,7 @@ a:active {
 						}
 					}
 				}
-				else if(53 == result){
+				else if(53 == result){//get mic success
 					if(data_len > 4){
 						var mic_num = dv.getUint32(8, true);
 						var offset = 12;
@@ -220,6 +222,11 @@ a:active {
 							micSel.add(op);
 						}
 					}
+				}
+				else if(85 == result){//cam_share success
+				document.getElementById('inputURL').value = "rtmp://127.0.0.1/live/cs";
+				queryParameters['source'] = "rtmp://127.0.0.1/live/cs";
+				initialise();
 				}
 				else{
 					var data_sting =  new TextDecoder("utf-8").decode(data);
@@ -289,8 +296,8 @@ a:active {
 				var buffer = new ArrayBuffer(cmd.data_len);
 				var mic_name_len = new Uint32Array(buffer, 0, 1);
 				var micSel = document.getElementById("mics");
-				var index = micSel.selectedIndex; // 选中索引
-				var sel_mic_name = micSel.options[index].text; // 选中文本
+				var index = micSel.selectedIndex;
+				var sel_mic_name = micSel.options[index].text;
 				mic_name_len[0] = sel_mic_name.length;
 				var urlname_len = new Uint32Array(buffer, 4, 1);
 				urlname_len[0] = 0;
@@ -316,8 +323,8 @@ a:active {
 				var buffer = new ArrayBuffer(cmd.data_len);
 				var cam_name_len = new Uint32Array(buffer, 0, 1);
 				var camSel = document.getElementById("cameras");
-				var index = camSel.selectedIndex; // 选中索引
-				var sel_cam_name = camSel.options[index].text; // 选中文本
+				var index = camSel.selectedIndex;
+				var sel_cam_name = camSel.options[index].text;
 				cam_name_len[0] = sel_cam_name.length;
 				var urlname_len = new Uint32Array(buffer, 4, 1);
 				urlname_len[0] = 0;
@@ -371,6 +378,10 @@ a:active {
 			}
 
 		}
+		
+	    function onJavaScriptBridgeCreated(id){  
+			player = document.getElementById(id);  
+		}  
 
         function initialise() 
         {
@@ -386,9 +397,23 @@ a:active {
 						return unescape( results[1] );
 			}
 
+			if(initload == true){
 			queryParameters['source'] = getUrlParam('source');
 			queryParameters['type'] = getUrlParam('type');
 			queryParameters['idx'] = getUrlParam('idx');
+			initload = false;
+			}
+			else{
+			   flashVars = "";
+			   swfobject.removeSWF("StrobeMediaPlayback");
+			   var v = document.getElementById("flashContent");
+			   if(v == null){
+			      var flashContentParent = document.getElementById("flashContentParent");
+				  if(flashContentParent){
+				     flashContentParent.innerHTML = "<div id=\"flashContent\"></div>";
+				  }
+			   }
+			}
 
 			if( queryParameters['source'] == "" )
 				queryParameters['source'] = "rtmp://localhost/live/ss";
@@ -398,6 +423,7 @@ a:active {
 				
 			if( queryParameters['idx'] == "" )
 				queryParameters['idx'] = "2";
+			
 
 			flashVars += "&src=";
             flashVars += queryParameters['source'];
@@ -419,7 +445,8 @@ a:active {
 			 streamType: queryParameters['type'],
                 autoPlay: "true",
                 controlBarAutoHide: "true",
-                controlBarPosition: "bottom"
+                controlBarPosition: "bottom",
+				javascriptCallbackFunction: "onJavaScriptBridgeCreated" 
             };
 
  			tag = "&lt;object width='640' height='377' id='StrobeMediaPlayback' name='StrobeMediaPlayback' type='application/x-shockwave-flash' classid='clsid:d27cdb6e-ae6d-11cf-96b8-444553540000' &gt;&lt;param name='movie' value='swfs/StrobeMediaPlayback.swf' /&gt; &lt;param name='quality' value='high' /&gt; &lt;param name='bgcolor' value='#000000' /&gt; &lt;param name='allowfullscreen' value='true' /&gt; &lt;param name='flashvars' value= '"+					
@@ -440,23 +467,15 @@ a:active {
 		attributes.align = "middle";
 		swfobject.embedSWF("swfs/StrobeMediaPlayback.swf", "flashContent", "640", "377", swfVersionStr, xiSwfUrlStr, soFlashVars, params, attributes);
 		<!-- JavaScript enabled so display the flashContent div in case it is not replaced with a swf object. -->
-		swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+		if(initload == true){
+			swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+		}
         } 
 
 		function playStream()
 		{
-			var url = "source=" + document.getElementById('inputURL').value;
-			var type;
-
-			if(document.getElementById('vodCheckbox').checked==true)
-				type="vod";
-			else
-				type="live";
-
-			url += ("&type=" + type);
-
-			document.getElementById('playBtn').href="demo.html?" + url;
-
+			queryParameters['source'] = document.getElementById('inputURL').value;
+			initialise();
 		}
 
 		function checkbox(type)
@@ -548,8 +567,8 @@ a:active {
 			 JavaScript and Flash plug-in support is available. The div is initially hidden so that it doesn't show
 			 when JavaScript is disabled.
 		-->
-
-        <div id="flashContent">
+         <div id="flashContentParent">
+		 <div id="flashContent">
         	<p>To view this page ensure that Adobe Flash Player version 10.3.0 or greater is installed.</p>
 			<script type="text/javascript"> 
 				var pageHost = ((document.location.protocol == "https:") ? "https://" :	"http://"); 
@@ -557,6 +576,7 @@ a:active {
 								+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" ); 
 			</script> 
         </div>
+		</div>
 			<noscript>
 				<a href="http://www.adobe.com/go/getflashplayer/" style="color:black"><img src="images/ERROR_getFlashPlayer.gif" width="640" height="377" /></a>
 				
