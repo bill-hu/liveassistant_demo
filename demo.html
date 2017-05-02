@@ -402,6 +402,18 @@ a:active {
 				cmd.data = new TextEncoder("utf-8").encode(sourceSel.options[index].text);
 				cmd.data_len = cmd.data.length;
 			}
+			else if(obj.id == "start_record"){
+				cmd.type = 48;
+				var param = document.getElementById("start_record_input");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
+			}
+			else if(obj.id == "stop_record"){
+				cmd.type = 49;
+				var param = document.getElementById("start_record_input");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
+			}
 			else if(obj.id == "start_push"){
 				cmd.type = 50;
 				var param = document.getElementById("start_push_input");
@@ -705,6 +717,11 @@ a:active {
 									 <td colspan="3"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
                                     <td colspan="3"><input id="start_push_input" width="800"/></td>
                                     <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
+                                    </tr>
+									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="start_record" onclick="javascript:onTestClick(this);">start_record</button></td>
+                                    <td colspan="3"><input id="start_record_input" width="800"/></td>
+                                    <td colspan="3"><button type="button" id="stop_record" onclick="javascript:onTestClick(this);">stop_record</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
