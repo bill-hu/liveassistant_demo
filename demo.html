@@ -132,6 +132,7 @@ a:active {
 
 <!-- functionality -->
 <script type="text/javascript" src="scripts/swfobject.js"></script>
+<script type="text/javascript" src="scripts/utf.js"></script>
     <script language="javascript">
 
 		var queryParameters = new Array();
@@ -144,6 +145,7 @@ a:active {
 		var initload = true;
 		var player;
 		
+	
   function testWebSocket()
   {
     websocket = new WebSocket(wsUri);
@@ -193,7 +195,8 @@ a:active {
 							offset += 4;
 							var cam_name = new Uint8Array(evt.target.result, offset , cam_name_len - 1);
 							offset += cam_name_len;
-							var data_sting =  new TextDecoder("utf-8").decode(cam_name);
+							//var data_sting =  new TextDecoder("utf-8").decode(cam_name);
+							var data_sting = utf8to16(cam_name);
 
 							writeToScreen('<span style="color: blue;">Camera: ' + i + " " + data_sting + ' </span>');
 							var op = document.createElement("option");
@@ -214,7 +217,8 @@ a:active {
 							offset += 4;
 							var mic_name = new Uint8Array(evt.target.result, offset , mic_name_len - 1);
 							offset += mic_name_len;
-							var data_sting =  new TextDecoder("utf-8").decode(mic_name);
+							//var data_sting =  new TextDecoder("utf-8").decode(mic_name);
+							var data_sting = utf8to16(mic_name);
 							writeToScreen('<span style="color: blue;">MIC: ' + i + " " + data_sting + ' </span>');
 							var op = document.createElement("option");
 							op.value = i;
@@ -230,14 +234,16 @@ a:active {
 				}
 				else if(95 == result){//get_videoparam success
 					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
-					var data_sting =  new TextDecoder("utf-8").decode(data);
+					//var data_sting =  new TextDecoder("utf-8").decode(data);
+					var data_sting = utf8to16(data);
 					var td = document.getElementById('videoparam');
 					td.value = data_sting;
 					writeToScreen('<span style="color: blue;">get_videoparam result: ' + data_sting + ' </span>');
 				}
 				else{
 				    var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
-					var data_sting =  new TextDecoder("utf-8").decode(data);
+					//var data_sting =  new TextDecoder("utf-8").decode(data);
+					var data_sting = utf8to16(data);
 					writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
 				}
 			}
@@ -292,7 +298,8 @@ a:active {
 			else if(obj.id == "ss_start"){
 				cmd.type = 6;
 				var param = document.getElementById("ss_start_input");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				//cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "ss_stop"){
@@ -322,7 +329,8 @@ a:active {
 				
 				var window_name_buffer = new Uint8Array(buffer, 24, 256);
 				var window_name = document.getElementById("ds_start_window_name").value;
-				var window_name_array = new TextEncoder("utf-8").encode(window_name);
+				//var window_name_array = new TextEncoder("utf-8").encode(window_name);
+				var window_name_array = utf16to8(window_name);
 				for(var i=0;i< window_name_array.length; i++){
 				   window_name_buffer[i] = window_name_array[i];
 				}
@@ -350,7 +358,8 @@ a:active {
 				var urlname_len = new Uint32Array(buffer, 4, 1);
 				urlname_len[0] = 0;
 				var mic_name = new Uint8Array(buffer, 8, 256);
-				var mic_name_array = new TextEncoder("utf-8").encode(sel_mic_name);
+				//var mic_name_array = new TextEncoder("utf-8").encode(sel_mic_name);
+				var mic_name_array = utf16to8(sel_mic_name);
 				for(var i=0;i< mic_name_array.length; i++){
 				   mic_name[i] = mic_name_array[i];
 				}
@@ -377,7 +386,8 @@ a:active {
 				var urlname_len = new Uint32Array(buffer, 4, 1);
 				urlname_len[0] = 0;
 				var cam_name = new Uint8Array(buffer, 8, 256);
-				var cam_name_array = new TextEncoder("utf-8").encode(sel_cam_name);
+				//var cam_name_array = new TextEncoder("utf-8").encode(sel_cam_name);
+				var cam_name_array = utf16to8(sel_cam_name);
 				for(var i=0;i< cam_name_array.length; i++){
 				   cam_name[i] = cam_name_array[i];
 				}
@@ -392,38 +402,41 @@ a:active {
 			else if(obj.id == "set_videoparam"){
 				cmd.type = 46;
 				var param = document.getElementById("videoparam");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				//cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "get_videoparam"){
 			    cmd.type = 47;
 				var sourceSel = document.getElementById("sources");
 				var index = sourceSel.selectedIndex;
-				cmd.data = new TextEncoder("utf-8").encode(sourceSel.options[index].text);
+				//cmd.data = new TextEncoder("utf-8").encode(sourceSel.options[index].text);
+				cmd.data = utf16to8(sourceSel.options[index].text);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "start_record"){
 				cmd.type = 48;
 				var param = document.getElementById("start_record_input");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				//cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "stop_record"){
 				cmd.type = 49;
 				var param = document.getElementById("start_record_input");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "start_push"){
 				cmd.type = 50;
 				var param = document.getElementById("start_push_input");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "stop_push"){
 				cmd.type = 51;
 				var param = document.getElementById("start_push_input");
-				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
 
