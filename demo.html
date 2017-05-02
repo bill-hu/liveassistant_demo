@@ -301,6 +301,43 @@ a:active {
 			else if(obj.id == "get_mic"){
 				cmd.type = 26;
 			}
+			else if(obj.id == "ds_start"){
+				cmd.type = 27;
+				cmd.data_len = 4*6 + 256 + 256;
+				var buffer = new ArrayBuffer(cmd.data_len);
+				var int32param = new Uint32Array(buffer, 0, 6);
+				var coordstr = document.getElementById("ds_start_coord").value;
+				var coordarray = coordstr.split(",");
+				if(coordarray.length == 4){
+					int32param[0] = parseInt(coordarray[0]);
+					int32param[1] = parseInt(coordarray[1]);
+					int32param[2] = parseInt(coordarray[2]);
+					int32param[3] = parseInt(coordarray[3]);
+				}
+				else
+				{
+				   //promopt error parameter
+				   return;//
+				}
+				
+				var window_name_buffer = new Uint8Array(buffer, 24, 256);
+				var window_name = document.getElementById("ds_start_window_name").value;
+				var window_name_array = new TextEncoder("utf-8").encode(window_name);
+				for(var i=0;i< window_name_array.length; i++){
+				   window_name_buffer[i] = window_name_array[i];
+				}
+				
+				int32param[4] = window_name_array.length;
+				int32param[5] = 0;
+				
+				var url_name = new Uint8Array(buffer, 24 + 256, 256);//todo: set push url
+				cmd.data = new Uint8Array(buffer, 0, cmd.data_len);
+				doSendWSCmd(cmd);
+				return;
+			}
+			else if(obj.id == "ds_stop"){
+				cmd.type = 28;
+			}
 			else if(obj.id == "aud_start"){
 				cmd.type = 29;
 				cmd.data_len = 4 + 4 + 256 + 256;
