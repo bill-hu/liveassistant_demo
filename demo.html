@@ -228,7 +228,15 @@ a:active {
 				queryParameters['source'] = "rtmp://127.0.0.1/live/cs";
 				initialise();
 				}
+				else if(95 == result){//get_videoparam success
+					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
+					var data_sting =  new TextDecoder("utf-8").decode(data);
+					var td = document.getElementById('videoparam');
+					td.value = data_sting;
+					writeToScreen('<span style="color: blue;">get_videoparam result: ' + data_sting + ' </span>');
+				}
 				else{
+				    var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
 					var data_sting =  new TextDecoder("utf-8").decode(data);
 					writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
 				}
@@ -283,6 +291,9 @@ a:active {
 			}
 			else if(obj.id == "ss_start"){
 				cmd.type = 6;
+				var param = document.getElementById("ss_start_input");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
 			}
 			else if(obj.id == "ss_stop"){
 			    cmd.type = 7;
@@ -341,6 +352,33 @@ a:active {
 			else if(obj.id == "cam_stop"){
 				cmd.type = 43;
 			}
+			else if(obj.id == "set_videoparam"){
+				cmd.type = 46;
+				var param = document.getElementById("videoparam");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
+			}
+			else if(obj.id == "get_videoparam"){
+			    cmd.type = 47;
+				var sourceSel = document.getElementById("sources");
+				var index = sourceSel.selectedIndex;
+				cmd.data = new TextEncoder("utf-8").encode(sourceSel.options[index].text);
+				cmd.data_len = cmd.data.length;
+			}
+			else if(obj.id == "start_push"){
+				cmd.type = 50;
+				var param = document.getElementById("start_push_input");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
+			}
+			else if(obj.id == "stop_push"){
+				cmd.type = 51;
+				var param = document.getElementById("start_push_input");
+				cmd.data = new TextEncoder("utf-8").encode(param.value);
+				cmd.data_len = cmd.data.length;
+			}
+
+			
 			doSendWSCmd(cmd);
 	}
 
@@ -413,6 +451,7 @@ a:active {
 				     flashContentParent.innerHTML = "<div id=\"flashContent\"></div>";
 				  }
 			   }
+			   queryParameters['type'] = "live";
 			}
 
 			if( queryParameters['source'] == "" )
@@ -531,29 +570,20 @@ a:active {
 </head>
 <body>
  <table width="100" height="" border="0" align="left" cellpadding="0" cellspacing="0">
-<!-- fwtable fwsrc="080715_fms_splash_fireworks.png" fwbase="index.gif" fwstyle="Dreamweaver" fwdocid = "1526025482" fwnested="0" -->
-<tr><td width="41"><img src="images/spacer.gif" width="41" height="1" border="0" alt="" /></td>
-   <td width="3"><img src="images/spacer.gif" width="3" height="1" border="0" alt="" /></td>
-   <td width="647"><img src="images/spacer.gif" width="636" height="1" border="0" alt="" /></td>
-   <td width="361"><img src="images/spacer.gif" width="358" height="1" border="0" alt="" /></td>
-   <td width="44"><img src="images/spacer.gif" width="43" height="1" border="0" alt="" /></td>
-   </tr>
-
-  <tr valign="top">
-    <td rowspan="4" bgcolor="#191919"><img src="images/spacer.gif" width="55" height="50" /></td>
+ <tr valign="top">
     <td rowspan="4"></td>
     <td height="327" colspan="3" bgcolor="#191919">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <table width="100" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
               <tr>
                 <td width="61" colspan="4" bgcolor="#191919"><table width="100" border="0" cellspacing="0" cellpadding="0">
                   <tr>
                     <td width="93%"><table width="98%" border="0" cellpadding="0" cellspacing="0">
-                        
+   
 
                         <tr>
-                          <td colspan="4" align="left" bgcolor="#191919"><img src="images/canvas.gif" alt="" name="index_r4_c3" width="1000" height="39" border="0" id="index_r4_c3"/></td>
+                          <td colspan="4" align="left" bgcolor="#191919"><img src="images/canvas.gif" alt="" name="index_r4_c3" width="1200" height="39" border="0" id="index_r4_c3"/></td>
                         </tr>
                         
                         <tr>
@@ -579,33 +609,27 @@ a:active {
 		</div>
 			<noscript>
 				<a href="http://www.adobe.com/go/getflashplayer/" style="color:black"><img src="images/ERROR_getFlashPlayer.gif" width="640" height="377" /></a>
-				
-			</noscript>				
+		</noscript>				
 		 </td>
         </tr>
-        </table>
+        </table> 	
 		</td>
-                              <td width="36%"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                              <td width="100"><table width="100" border="0" cellspacing="0" cellpadding="0">
+							     <tr width="323"><td><span class="style75">click on following buttons to test liveserver method</span></td><td>&nbsp;</td>
+								 <td>&nbsp;</td></tr>
                                 <tr>
-                                  <td width="359" height="186" background="images/upperright_03.gif"><table width="358" border="0" cellspacing="0" cellpadding="0">
-                                    <tr>
-                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td width="323"><span class="style75">click on following buttons to test liveserver method</span></td>
-                                    </tr>
+                                  <td width="800" height="300" background="images/upperright_03.gif">
+								  <table width="510" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
                                       <td colspan="3"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
-                                    </tr>
-                                    <tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									  <td colspan="3"><input id="ss_start_input" width="400"/></td>
 									 <td colspan="3"><button type="button" id="ss_stop" onclick="javascript:onTestClick(this);">ss_stop</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="ds_start" onclick="javascript:onTestClick(this);">ds_start</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+                                     <td colspan="3"><input id="ds_start_coord" width="400"/><input id="ds_start_window_name" width="400"/></td>
 									 <td colspan="3"><button type="button" id="ds_stop" onclick="javascript:onTestClick(this);">ds_stop</button></td>
                                     </tr>
 									<tr>
@@ -617,17 +641,13 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									  <td colspan="3"></td>
 									 <td colspan="3"><button type="button" id="aud_stop" onclick="javascript:onTestClick(this);">aud_stop</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									  <td colspan="3"></td>
 									 <td colspan="3"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
                                     </tr>
 									<tr>
@@ -640,18 +660,21 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+                                     <td colspan="3"></td>
 									 <td colspan="3"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
+                                    <td colspan="3"><input id="start_push_input" width="800"/></td>
+                                    <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
+									 <td colspan="3"><button type="button" id="get_videoparam" onclick="javascript:onTestClick(this);">get_videoparam</button></td>
+									 <td><select width = "100" id="sources" name="sources" /><option value ="scr">scr</option><option value ="scr">doc</option>
+									  <option value ="scr">mov</option><option value ="scr">cam</option><<input id="videoparam" width="1000"/></td>
+								    <td colspan="5"><button type="button" id="set_videoparam" onclick="javascript:onTestClick(this);">set_videoparam</button></td>
                                     </tr>
                                   </table></td>
                                 </tr>
@@ -673,17 +696,16 @@ a:active {
     <td colspan="2" valign="top" bgcolor="#191919"><table width="100" border="0" align="left" cellpadding="0" cellspacing="0">
         <!-- fwtable fwsrc="080715_fms_splash_fireworks.png" fwbase="index.gif" fwstyle="Dreamweaver" fwdocid = "1526025482" fwnested="0" -->
         <tr>
-          <td colspan="3" valign="top"><img src="images/spacer.gif" width="55" height="40" /></td>
+          <td colspan="3" valign="top"><img src="images/spacer.gif" width="55" height="10" /></td>
         </tr>
         <tr>
           <td colspan="3" valign="top"><table width="87%" border="0" cellspacing="0" cellpadding="0">
             <tr>
-              <td><span class="style69">STREAM YOUR OWN VIDEO</span></td>
+              <td><span class="style69">Play RTMP stream</span></td>
             </tr>
             <tr>
               <td bgcolor="#666666"><img src="images/spacer.gif" width="20" height="3" /></td>
             </tr>
-            
             <tr>
               <td><img src="images/spacer.gif" width="55" height="10" /></td>
             </tr>
@@ -712,7 +734,7 @@ a:active {
             </tr>
           </table></td>
         </tr>
-		          <td colspan="3" valign="top"><table width="87%" border="0" cellspacing="0" cellpadding="0">
+		     <td colspan="3" valign="top"><table width="87%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td><span class="style69">Connect Xuedianyun LiveServer</span></td>
             </tr>
@@ -744,15 +766,11 @@ a:active {
                     </tr>
                   </table></td>
                   </tr>
-                <tr>
-                  <td colspan="4">&nbsp;</td>
-                </tr>
               </table></td>
             </tr>
           </table></td>
         </tr>
-
 </table>
-<div id="output"></div>
+<div id = output />
 </body>
 </html>
