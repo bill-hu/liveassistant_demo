@@ -144,6 +144,7 @@ a:active {
 		var websocket;
 		var initload = true;
 		var player;
+		var rtmp_port = 1935;
 		
 	
   function testWebSocket()
@@ -168,6 +169,12 @@ a:active {
 	wsState = "idle";
   }
   
+  function playRTMPStream(url){
+  	document.getElementById('inputURL').value = url;
+	queryParameters['source'] = url;
+	initialize();
+  }
+  
   function onMessage(evt)
   {
  	if(typeof(evt.data)=="string"){ 
@@ -183,8 +190,17 @@ a:active {
 				var result = dv.getUint16(0, true);
 				var byte_order = dv.getUint8(2, true);
 				var data_len = dv.getUint32(4, true);
-
-				if(result == 83){//get camera sucess
+				
+				if(0 == result){//mov_start success
+					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ms");
+				}
+				else if(11 == result){//ss_start success
+					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ss");
+				}
+				else if(55 == result){//ds_start success
+					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ds");
+				}
+				else if(result == 83){//get camera sucess
 					if(data_len > 4){
 						var cam_num = dv.getUint32(8, true);
 						var offset = 12;
@@ -228,17 +244,24 @@ a:active {
 					}
 				}
 				else if(85 == result){//cam_share success
-				document.getElementById('inputURL').value = "rtmp://127.0.0.1/live/cs";
-				queryParameters['source'] = "rtmp://127.0.0.1/live/cs";
-				initialise();
+					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/cs");
 				}
 				else if(95 == result){//get_videoparam success
 					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
 					//var data_sting =  new TextDecoder("utf-8").decode(data);
 					var data_sting = utf8to16(data);
-					var td = document.getElementById('videoparam');
-					td.value = data_sting;
+					var input = document.getElementById('videoparam');
+					input.value = data_sting;
 					writeToScreen('<span style="color: blue;">get_videoparam result: ' + data_sting + ' </span>');
+				}
+				else if(105 == result){//get_rtmp_port_success
+				   	var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
+					//var data_sting =  new TextDecoder("utf-8").decode(data);
+					var data_sting = utf8to16(data);
+					var input = document.getElementById('rtmp_port');
+					input.value = data_sting;
+					rtmp_port = data_sting;
+					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
 				}
 				else{
 				    var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
@@ -439,7 +462,9 @@ a:active {
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-
+			else if(obj.id == "get_rtmp_port"){
+				cmd.type = 52;
+			}
 			
 			doSendWSCmd(cmd);
 	}
@@ -483,7 +508,7 @@ a:active {
 			player = document.getElementById(id);  
 		}  
 
-        function initialise() 
+        function initialize() 
         {
 			function getUrlParam( name )
 			{
@@ -576,7 +601,7 @@ a:active {
 		function playStream()
 		{
 			queryParameters['source'] = document.getElementById('inputURL').value;
-			initialise();
+			initialize();
 		}
 
 		function checkbox(type)
@@ -625,7 +650,7 @@ a:active {
 			output.innerHTML = "";
 		}
 		
-		initialise();
+		initialize();
 
     </script>
 
@@ -682,6 +707,11 @@ a:active {
                                 <tr>
                                   <td width="800" height="300" background="images/upperright_03.gif">
 								  <table width="510" border="0" cellspacing="0" cellpadding="0">
+								  <tr>
+									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+                                      <td colspan="3"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
+									  <td colspan="3"><input id="rtmp_port" width="400"/></td>
+				                    </tr>
                                     <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
                                       <td colspan="3"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
