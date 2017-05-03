@@ -175,6 +175,119 @@ a:active {
 	initialize();
   }
   
+  var wsResult = [
+  	"MOV_START_SUC",
+	"MOV_START_FAIL",
+	"MOV_STOP_SUC",
+	"MOV_STOP_FAIL",
+	"MOV_PAUSE_SUC",
+	"MOV_PAUSE_FAIL",
+	"MOV_RESUME_SUC",
+	"MOV_RESUME_FAIL",
+	"MOV_SEEK_SUC",
+	"MOV_SEEK_FAIL",
+	"MOV_PROPERTY",
+	"SS_START_SUC",
+	"SS_START_FAIL",
+	"SS_STOP_SUC",
+	"SS_STOP_FAIL",
+	"REC_START_SUC",
+	"REC_START_FAIL",
+	"REC_STOP_SUC",
+	"REC_STOP_FAIL",
+	"REC_PAUSE_SUC",
+	"REC_PAUSE_FAIL",
+	"REC_RESUME_SUC",
+	"REC_RESUME_FAIL",
+	"MOV_PLAY_FINISH",
+	"MOV_VERSION",
+	"SS_VERSION",
+	"REC_VERSION",
+	"MOV_SELECT_FILE_CANCEL",
+	"QAV_LOGIN_SUC",
+	"QAV_LOGIN_FAIL",
+	"QAV_LOGOUT_SUC",
+	"QAV_LOGOUT_FAIL",
+	"QAV_ENTERROOM_SUC",
+	"QAV_ENTERROOM_FAIL",
+	"QAV_LEAVEROOM_SUC",
+	"QAV_LEAVEROOM_FAIL",
+	"QAV_OPEN_MIC_SUC",
+	"QAV_OPEN_MIC_FAIL",
+	"QAV_OPEN_MIC_NODEV",
+	"QAV_CLOSE_MIC_SUC",
+	"QAV_CLOSE_MIC_FAIL",
+	"QAV_CLOSE_MIC_NODEV",
+	"QAV_OPEN_PLAYER_SUC",
+	"QAV_OPEN_PLAYER_FAIL",
+	"QAV_OPEN_PLAYER_NODEV",
+	"QAV_CLOSE_PLAYER_SUC",
+	"QAV_CLOSE_PLAYER_FAIL",
+	"QAV_CLOSE_PLAYER_NODEV",
+	"QAV_MUTE_AUDIO_SUC",
+	"QAV_MUTE_AUDIO_FAIL",
+	"QAV_UNMUTE_AUDIO_SUC",
+	"QAV_UNMUTE_AUDIO_FAIL",
+	"REC_SAVE_FILE_CANCEL",
+	"GET_MIC_SUC",
+	"GET_MIC_FAIL",
+	"DS_START_SUC",
+	"DS_START_FAIL",
+	"DS_STOP_SUC",
+	"DS_STOP_FAIL",
+	"AUD_START_SUC",
+	"AUD_START_FAIL",
+	"AUD_STOP_SUC",
+	"AUD_STOP_FAIL",
+	"AUD_DATA",
+	"SS_DATA",
+	"MOV_DATA",
+	"PEN_START_SUC",
+	"PEN_START_FAIL",
+	"PEN_STOP_SUC",
+	"PEN_STOP_FAIL",
+	"PEN_VERSION",
+    "QAV_DEVICE_SUC",
+    "QAV_DEVICE_FAIL",
+	"CBD_QUERY_SUC",
+	"CBD_QUERY_FAIL",
+	"CBD_GET_SUC",
+	"CBD_GET_FAIL",
+	"FILE_GET_SUC",
+	"FILE_GET_FAIL",
+	"FILE_SET_SUC",
+	"FILE_SET_FAIL",
+	"RESTART_SUC",
+	"RESTART_FAIL",
+	"GET_CAM_SUC",
+	"GET_CAM_FAIL",
+	"CAM_START_SUC",
+	"CAM_START_FAIL",
+	"CAM_STOP_SUC",
+	"CAM_STOP_FAIL",
+	"SWITCH_SCENE_SUC",
+	"SWITCH_SCENE_FAIL",
+	"PUSH_STREAM_FAIL",
+	"SHOW_UI_SUC",
+	"SET_VIDEO_PARAM_SUC",
+	"SET_VIDEO_PARAM_FAIL",
+	"GET_VIDEO_PARAM_SUC",
+	"GET_VIDEO_PARAM_FAIL",
+	"START_RECORD_SUC",
+	"START_RECORD_FAIL",
+	"STOP_RECORD_SUC",
+	"STOP_RECORD_FAIL",
+	"START_PUSH_SUC",
+	"START_PUSH_FAIL",
+	"STOP_PUSH_SUC",
+	"STOP_PUSH_FAIL",
+	"GET_RTMP_PORT_SUC",
+	"GET_RTMP_PORT_FAIL",
+	"SET_MIC_VOL_SUC",
+	"SET_MIC_VOL_FAIL",
+	"GET_MIC_VOL_SUC",
+	"GET_MIC_VOL_FAIL"];
+  
   function onMessage(evt)
   {
  	if(typeof(evt.data)=="string"){ 
@@ -190,6 +303,14 @@ a:active {
 				var result = dv.getUint16(0, true);
 				var byte_order = dv.getUint8(2, true);
 				var data_len = dv.getUint32(4, true);
+				
+				if( result >= 0 && result < wsResult.length ){
+					var resultString = wsResult[result];
+					writeToScreen('<span style="color: blue;">result: ' + resultString + ' </span>');
+				}
+				else{
+					writeToScreen('<span style="color: blue;">result:  unknown result  </span>');
+				}
 				
 				if(0 == result){//mov_start success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ms");
@@ -261,6 +382,14 @@ a:active {
 					var input = document.getElementById('rtmp_port');
 					input.value = data_sting;
 					rtmp_port = data_sting;
+					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
+				}
+				else if(109 == result){//get_mic_vol success
+					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
+					//var data_sting =  new TextDecoder("utf-8").decode(data);
+					var data_sting = utf8to16(data);
+					var input = document.getElementById('mic_vol');
+					input.value = data_sting;
 					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
 				}
 				else{
@@ -464,6 +593,15 @@ a:active {
 			}
 			else if(obj.id == "get_rtmp_port"){
 				cmd.type = 52;
+			}
+			else if(obj.id == "set_mic_vol"){
+			    cmd.type = 53;
+				var param = document.getElementById("mic_vol");
+				cmd.data = utf16to8(param.value);
+				cmd.data_len = cmd.data.length;
+			}
+			else if(obj.id == "get_mic_vol"){
+			    cmd.type = 54;
 			}
 			
 			doSendWSCmd(cmd);
@@ -730,6 +868,12 @@ a:active {
 									  <td width="300" ><img src="images/spacer.gif" width="20" height="10" />
 									 <select width = "300" id="mics" name="mics" /></td>
                                     </tr>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									 <td colspan="3"><button type="button" id="get_mic_vol" onclick="javascript:onTestClick(this);">get_mic_vol</button></td>
+                                     <td colspan="3"><input id="mic_vol" width="400"/></td>
+									 <td colspan="3"><button type="button" id="set_mic_vol" onclick="javascript:onTestClick(this);">set_mic_vol</button></td>
+                                    </tr>									
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
