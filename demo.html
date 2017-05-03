@@ -322,6 +322,9 @@ a:active {
 						writeToScreen(info);
 						info = "framerate:" + uint32params[2] + " duration:" + uint32params[3];
 						writeToScreen(info);  
+						
+						document.getElementById("mov_pos").value = parseInt(uint32params[3]);
+						
                         info = "playpos:" + uint32params[4] + " filesize:" + uint32params[5];						
 						writeToScreen(info);  
 						var file_name_len = uint32params[6];
