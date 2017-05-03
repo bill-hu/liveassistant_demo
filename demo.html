@@ -312,8 +312,23 @@ a:active {
 					writeToScreen('<span style="color: blue;">result:  unknown result  </span>');
 				}
 				
-				if(0 == result){//mov_start success
+				if(0 == result || 6 == result || 8 == result){//mov_start,mov_pause,mov_seek success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ms");
+				}
+				else if(10 == result){//movie property
+				   if(data_len > 7 * 4 + 8){
+						var uint32params = new Uint32Array(evt.target.result, 8, 8);
+						var info = "width:" + uint32params[0] + " height:" + uint32params[1];
+						writeToScreen(info);
+						info = "framerate:" + uint32params[2] + " duration:" + uint32params[3];
+						writeToScreen(info);  
+                        info = "playpos:" + uint32params[4] + " filesize:" + uint32params[5];						
+						writeToScreen(info);  
+						var file_name_len = uint32params[6];
+						var file_name = new Uint8Array(evt.target.result, 40 , file_name_len);
+						var file_name_string = utf8to16(file_name);
+						writeToScreen("filename:"+ file_name_string);
+				   }
 				}
 				else if(11 == result){//ss_start success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ss");
@@ -411,7 +426,12 @@ a:active {
 
   function doSendWSCmd(wsCmd)
   {
-    writeToScreen("SENT: " + wsCmd.name);
+   if(wsState != "connected"){
+		writeToScreen("websocket isn't connected,please connect first!");
+		return;
+   }
+  
+    writeToScreen("Send: " + wsCmd.name);
 
 	var cmd_buf_len = 2 + 1*2 + 4 + wsCmd.data_len;
 	var buffer = new ArrayBuffer(cmd_buf_len);
@@ -446,6 +466,31 @@ a:active {
 			}
 			else if(obj.id == "mov_stop"){
 				cmd.type = 2;
+			}
+			else if(obj.id == "mov_pause"){
+			    cmd.type = 3;
+				var pos = document.getElementById("mov_pos").value;
+				if(pos.length > 0){
+				   cmd.data_len = 4;
+				   var buffer = new ArrayBuffer(cmd.data_len);
+					var Uint32param = new Uint32Array(buffer, 0, 1);
+					Uint32param[0] = parseInt(pos);
+					cmd.data = new Uint8Array(buffer, 0, 4);
+				}
+			}
+			else if(obj.id == "mov_resume"){
+			    cmd.type = 4;
+			}
+			else if(obj.id == "mov_seek"){
+			    cmd.type = 5;
+				var pos = document.getElementById("mov_pos").value;
+				if(pos.length > 0){
+				   cmd.data_len = 4;
+				   var buffer = new ArrayBuffer(cmd.data_len);
+					var Uint32param = new Uint32Array(buffer, 0, 1);
+					Uint32param[0] = parseInt(pos);
+					cmd.data = new Uint8Array(buffer, 0, 4);
+				}
 			}
 			else if(obj.id == "ss_start"){
 				cmd.type = 6;
@@ -883,8 +928,14 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
-									  <td colspan="3"></td>
+									 <td colspan="3"> <button type="button" id="mov_seek" onclick="javascript:onTestClick(this);">mov_seek</button></td>
 									 <td colspan="3"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
+                                    </tr>
+									<tr>
+                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
+									  <td colspan="3"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
+									   <td colspan="3"><input id="mov_pos" width="800"/></td>
+									 <td colspan="3"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
