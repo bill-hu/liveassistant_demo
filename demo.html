@@ -756,6 +756,10 @@ a:active {
                 autoPlay: "true",
                 controlBarAutoHide: "true",
                 controlBarPosition: "bottom",
+				liveBufferTime : "1", 
+				liveDynamicStreamingBufferTime :"0",
+				bufferTime :"0",
+				initialBufferTime :"0",
 				javascriptCallbackFunction: "onJavaScriptBridgeCreated" 
             };
 
@@ -894,18 +898,18 @@ a:active {
 								  <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
                                       <td colspan="3"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
-									  <td colspan="3"><input id="rtmp_port" width="400" readonly="readonly"/></td>
+									  <td colspan="3" width="600" ><input id="rtmp_port"  readonly="readonly"/></td>
 				                    </tr>
                                     <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
                                       <td colspan="3"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
-									  <td colspan="3"><input id="ss_start_input" width="400"/></td>
+									  <td colspan="3"><input id="ss_start_input" size="45"/></td>
 									 <td colspan="3"><button type="button" id="ss_stop" onclick="javascript:onTestClick(this);">ss_stop</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="ds_start" onclick="javascript:onTestClick(this);">ds_start</button></td>
-                                     <td colspan="3"><input id="ds_start_coord" width="400"/><input id="ds_start_window_name" width="400"/></td>
+                                     <td colspan="3"><input id="ds_start_coord" size="45"/><input id="ds_start_window_name" size="45"/></td>
 									 <td colspan="3"><button type="button" id="ds_stop" onclick="javascript:onTestClick(this);">ds_stop</button></td>
                                     </tr>
 									<tr>
@@ -935,7 +939,7 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									  <td colspan="3"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
-									   <td colspan="3"><input id="mov_pos" width="800"/></td>
+									   <td colspan="3"><input id="mov_pos" size="45"/></td>
 									 <td colspan="3"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
                                     </tr>
 									<tr>
@@ -954,19 +958,19 @@ a:active {
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
-                                    <td colspan="3"><input id="start_push_input" width="800"/></td>
+                                    <td colspan="3"><input id="start_push_input" size="45"/></td>
                                     <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
                                     </tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="start_record" onclick="javascript:onTestClick(this);">start_record</button></td>
-                                    <td colspan="3"><input id="start_record_input" width="800"/></td>
+                                    <td colspan="3"><input id="start_record_input" size="45"/></td>
                                     <td colspan="3"><button type="button" id="stop_record" onclick="javascript:onTestClick(this);">stop_record</button></td>
                                     </tr>
 									<tr>
                                      <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
 									 <td colspan="3"><button type="button" id="get_videoparam" onclick="javascript:onTestClick(this);">get_videoparam</button></td>
 									 <td><select width = "100" id="sources" name="sources" /><option value ="scr">scr</option><option value ="scr">doc</option>
-									  <option value ="scr">mov</option><option value ="scr">cam</option><<input id="videoparam" width="1000"/></td>
+									  <option value ="scr">mov</option><option value ="scr">cam</option><<input id="videoparam" size="36"/></td>
 								    <td colspan="5"><button type="button" id="set_videoparam" onclick="javascript:onTestClick(this);">set_videoparam</button></td>
                                     </tr>
                                   </table></td>
