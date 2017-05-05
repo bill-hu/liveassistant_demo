@@ -145,22 +145,15 @@ a:active {
 		var initload = true;
 		var player;
 		var rtmp_port = 1935;
-		
 	
-  function testWebSocket()
-  {
-    websocket = new WebSocket(wsUri);
-    websocket.onopen = function(evt) { onOpen(evt) };
-    websocket.onclose = function(evt) { onClose(evt) };
-    websocket.onmessage = function(evt) { onMessage(evt) };
-    websocket.onerror = function(evt) { onError(evt) };
-  }
-
   function onOpen(evt)
   {
     writeToScreen("websocket connected");
 	wsState = "connected";
- //   doSend("get_mic_vol");
+    doCmd("get_rtmp_port");
+	doCmd("get_mic");
+	doCmd("get_cam");
+	doCmd("get_mic_vol");
   }
 
   function onClose(evt)
@@ -458,19 +451,24 @@ a:active {
   
   	function onTestClick(obj)
 	{
-			writeToScreen(obj.id);
+		doCmd(obj.id);
+	}
+	
+	function doCmd(cmdName)
+	{
+			writeToScreen(cmdName);
 			var cmd = new Object();
 			cmd.data_len = 0;
 			cmd.data = "";
-			cmd.name = obj.id;
+			cmd.name = cmdName;
 			
-			if(obj.id == "mov_start"){
+			if(cmdName == "mov_start"){
 				cmd.type = 1;
 			}
-			else if(obj.id == "mov_stop"){
+			else if(cmdName == "mov_stop"){
 				cmd.type = 2;
 			}
-			else if(obj.id == "mov_pause"){
+			else if(cmdName == "mov_pause"){
 			    cmd.type = 3;
 				var pos = document.getElementById("mov_pos").value;
 				if(pos.length > 0){
@@ -481,10 +479,10 @@ a:active {
 					cmd.data = new Uint8Array(buffer, 0, 4);
 				}
 			}
-			else if(obj.id == "mov_resume"){
+			else if(cmdName == "mov_resume"){
 			    cmd.type = 4;
 			}
-			else if(obj.id == "mov_seek"){
+			else if(cmdName == "mov_seek"){
 			    cmd.type = 5;
 				var pos = document.getElementById("mov_pos").value;
 				if(pos.length > 0){
@@ -495,20 +493,20 @@ a:active {
 					cmd.data = new Uint8Array(buffer, 0, 4);
 				}
 			}
-			else if(obj.id == "ss_start"){
+			else if(cmdName == "ss_start"){
 				cmd.type = 6;
 				var param = document.getElementById("ss_start_input");
 				//cmd.data = new TextEncoder("utf-8").encode(param.value);
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "ss_stop"){
+			else if(cmdName == "ss_stop"){
 			    cmd.type = 7;
 			}
-			else if(obj.id == "get_mic"){
+			else if(cmdName == "get_mic"){
 				cmd.type = 26;
 			}
-			else if(obj.id == "ds_start"){
+			else if(cmdName == "ds_start"){
 				cmd.type = 27;
 				cmd.data_len = 4*6 + 256 + 256;
 				var buffer = new ArrayBuffer(cmd.data_len);
@@ -543,10 +541,10 @@ a:active {
 				doSendWSCmd(cmd);
 				return;
 			}
-			else if(obj.id == "ds_stop"){
+			else if(cmdName == "ds_stop"){
 				cmd.type = 28;
 			}
-			else if(obj.id == "aud_start"){
+			else if(cmdName == "aud_start"){
 				cmd.type = 29;
 				cmd.data_len = 4 + 4 + 256 + 256;
 				var buffer = new ArrayBuffer(cmd.data_len);
@@ -568,13 +566,13 @@ a:active {
 				doSendWSCmd(cmd);
 				return;
 			}
-			else if(obj.id == "aud_stop"){
+			else if(cmdName == "aud_stop"){
 				cmd.type = 30;
 			}
-			else if(obj.id == "get_cam"){
+			else if(cmdName == "get_cam"){
 				cmd.type = 41;
 			}
-			else if(obj.id == "cam_start"){
+			else if(cmdName == "cam_start"){
 				cmd.type = 42;
 				cmd.data_len = 4 + 4 + 256 + 256;
 				var buffer = new ArrayBuffer(cmd.data_len);
@@ -596,17 +594,17 @@ a:active {
 				doSendWSCmd(cmd);
 				return;
 			}
-			else if(obj.id == "cam_stop"){
+			else if(cmdName == "cam_stop"){
 				cmd.type = 43;
 			}
-			else if(obj.id == "set_videoparam"){
+			else if(cmdName == "set_videoparam"){
 				cmd.type = 46;
 				var param = document.getElementById("videoparam");
 				//cmd.data = new TextEncoder("utf-8").encode(param.value);
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "get_videoparam"){
+			else if(cmdName == "get_videoparam"){
 			    cmd.type = 47;
 				var sourceSel = document.getElementById("sources");
 				var index = sourceSel.selectedIndex;
@@ -614,41 +612,41 @@ a:active {
 				cmd.data = utf16to8(sourceSel.options[index].text);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "start_record"){
+			else if(cmdName == "start_record"){
 				cmd.type = 48;
 				var param = document.getElementById("start_record_input");
 				//cmd.data = new TextEncoder("utf-8").encode(param.value);
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "stop_record"){
+			else if(cmdName == "stop_record"){
 				cmd.type = 49;
 				var param = document.getElementById("start_record_input");
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "start_push"){
+			else if(cmdName == "start_push"){
 				cmd.type = 50;
 				var param = document.getElementById("start_push_input");
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "stop_push"){
+			else if(cmdName == "stop_push"){
 				cmd.type = 51;
 				var param = document.getElementById("start_push_input");
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "get_rtmp_port"){
+			else if(cmdName == "get_rtmp_port"){
 				cmd.type = 52;
 			}
-			else if(obj.id == "set_mic_vol"){
+			else if(cmdName == "set_mic_vol"){
 			    cmd.type = 53;
 				var param = document.getElementById("mic_vol");
 				cmd.data = utf16to8(param.value);
 				cmd.data_len = cmd.data.length;
 			}
-			else if(obj.id == "get_mic_vol"){
+			else if(cmdName == "get_mic_vol"){
 			    cmd.type = 54;
 			}
 			
@@ -731,7 +729,7 @@ a:active {
 				queryParameters['source'] = "rtmp://localhost/live/ss";
 			
 			if( queryParameters['type'] == "" )
-				queryParameters['type'] = "recorded";
+				queryParameters['type'] = "live";
 				
 			if( queryParameters['idx'] == "" )
 				queryParameters['idx'] = "2";
@@ -896,7 +894,7 @@ a:active {
 								  <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
                                       <td colspan="3"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
-									  <td colspan="3"><input id="rtmp_port" width="400"/></td>
+									  <td colspan="3"><input id="rtmp_port" width="400" readonly="readonly"/></td>
 				                    </tr>
                                     <tr>
 									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
