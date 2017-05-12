@@ -278,7 +278,11 @@ a:active {
 	"SET_MIC_VOL_SUC",
 	"SET_MIC_VOL_FAIL",
 	"GET_MIC_VOL_SUC",
-	"GET_MIC_VOL_FAIL"];
+	"GET_MIC_VOL_FAIL",
+	"RTMP_CONNECTING",
+	"RTMP_CONNECT_SUC",
+	"RTMP_CONNECT_FAIL",
+	"RTMP_CONNECT_CLOSED"];
   
   function onMessage(evt)
   {
@@ -330,6 +334,9 @@ a:active {
 				}
 				else if(55 == result){//ds_start success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ds");
+				}
+				else if(59 == result){//as start success
+				    playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/as");
 				}
 				else if(result == 83){//get camera sucess
 					if(data_len > 4){
@@ -402,11 +409,16 @@ a:active {
 					input.value = data_sting;
 					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
 				}
+				else if(111 <=result && 114>= result){
+					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
+				    var url =  utf8to16(data);
+					writeToScreen('<span style="color: blue;">url: ' + url + ' </span>'); 
+				}
 				else{
 				    var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
 					//var data_sting =  new TextDecoder("utf-8").decode(data);
 					var data_sting = utf8to16(data);
-					writeToScreen('<span style="color: blue;">RESPONSE: ' + data_sting + ' </span>');
+					writeToScreen('<span style="color: blue;">url: ' + data_sting + ' </span>');
 				}
 			}
 		}
@@ -702,6 +714,9 @@ function getExplorerTitle() {
 
 			var default_ss_start_pos = "0,0," + window.screen.width + "," + window.screen.height;
 			document.getElementById('ds_start_coord').value = default_ss_start_pos; 
+			//video=scr,doc,mov,non ; audio=mic,mov,non
+			document.getElementById('start_push_input').value = "0 video=scr audio=mic rtmp://127.0.0.1/live/1";
+			document.getElementById('start_record_input').value = "0 video=scr audio=mic";
 		}
 		
 	    function onJavaScriptBridgeCreated(id){  
@@ -805,31 +820,13 @@ function getExplorerTitle() {
 			initialize();
 		}
 
-		function checkbox(type)
-		{
-			if(type=="vod")
-			{
-				if(document.getElementById('liveCheckbox').checked==true)
-				{
-					document.getElementById('liveCheckbox').checked=false;
-				}
-			}
-			if(type=="live")
-			{
-				if(document.getElementById('vodCheckbox').checked==true)
-				{
-					document.getElementById('vodCheckbox').checked=false;
-				}
-			}
-		}
-		
 		function connectLiveServ()
 		{
 			var url = document.getElementById('websocketURL').value;
 		
 			if( wsState == "idle"){
-			wsState = "connecting";
-			writeToScreen("connecting " + url);
+				wsState = "connecting";
+				writeToScreen("connecting " + url);
 			    websocket = new WebSocket(url);
 				websocket.onopen = function(evt) { onOpen(evt) };
 				websocket.onclose = function(evt) { onClose(evt) };
