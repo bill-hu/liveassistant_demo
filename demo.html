@@ -287,25 +287,25 @@ a:active {
   function onMessage(evt)
   {
  	if(typeof(evt.data)=="string"){ 
-	 writeToScreen('<span style="color: blue;">receive string</span>');
+	 writeToScreen('<span style="color: green;">receive string</span>');
 	}
 	else{ 
-		writeToScreen('<span style="color: blue;">receive binary</span>');
+		writeToScreen('<span style="color: green;">receive binary</span>');
 		var reader = new FileReader(); 
 		reader.onload = function(evt){ 
 			if(evt.target.readyState == FileReader.DONE){ 
 				var dv = new DataView(evt.target.result); 
-				writeToScreen('<span style="color: blue;">receive string ' + dv.byteLength +'</span>');
+				writeToScreen('<span style="color: green;">receive string ' + dv.byteLength +'</span>');
 				var result = dv.getUint16(0, true);
 				var byte_order = dv.getUint8(2, true);
 				var data_len = dv.getUint32(4, true);
 				
 				if( result >= 0 && result < wsResult.length ){
 					var resultString = wsResult[result];
-					writeToScreen('<span style="color: blue;">result: ' + resultString + ' </span>');
+					writeToScreen('<span style="color: green;">result: ' + resultString + ' </span>');
 				}
 				else{
-					writeToScreen('<span style="color: blue;">result:  unknown result  </span>');
+					writeToScreen('<span style="color: green;">result:  unknown result  </span>');
 				}
 				
 				if(0 == result || 6 == result || 8 == result){//mov_start,mov_pause,mov_seek success
@@ -352,7 +352,7 @@ a:active {
 							//var data_sting =  new TextDecoder("utf-8").decode(cam_name);
 							var data_sting = utf8to16(cam_name);
 
-							writeToScreen('<span style="color: blue;">Camera: ' + i + " " + data_sting + ' </span>');
+							writeToScreen('<span style="color: green;">Camera: ' + i + " " + data_sting + ' </span>');
 							var op = document.createElement("option");
 							op.value = i;
 							op.text = data_sting;
@@ -373,7 +373,7 @@ a:active {
 							offset += mic_name_len;
 							//var data_sting =  new TextDecoder("utf-8").decode(mic_name);
 							var data_sting = utf8to16(mic_name);
-							writeToScreen('<span style="color: blue;">MIC: ' + i + " " + data_sting + ' </span>');
+							writeToScreen('<span style="color: green;">MIC: ' + i + " " + data_sting + ' </span>');
 							var op = document.createElement("option");
 							op.value = i;
 							op.text = data_sting;
@@ -390,7 +390,7 @@ a:active {
 					var data_sting = utf8to16(data);
 					var input = document.getElementById('videoparam');
 					input.value = data_sting;
-					writeToScreen('<span style="color: blue;">get_videoparam result: ' + data_sting + ' </span>');
+					writeToScreen('<span style="color: green;">get_videoparam result: ' + data_sting + ' </span>');
 				}
 				else if(105 == result){//get_rtmp_port_success
 				   	var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
@@ -399,7 +399,7 @@ a:active {
 					var input = document.getElementById('rtmp_port');
 					input.value = data_sting;
 					rtmp_port = data_sting;
-					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
+					writeToScreen('<span style="color: green;">get_rtmp_port result: ' + data_sting + ' </span>'); 
 				}
 				else if(109 == result){//get_mic_vol success
 					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8 -1);
@@ -407,18 +407,18 @@ a:active {
 					var data_sting = utf8to16(data);
 					var input = document.getElementById('mic_vol');
 					input.value = data_sting;
-					writeToScreen('<span style="color: blue;">get_rtmp_port result: ' + data_sting + ' </span>'); 
+					writeToScreen('<span style="color: green;">get_mic_vol result: ' + data_sting + ' </span>'); 
 				}
 				else if(111 <=result && 114>= result){
 					var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
 				    var url =  utf8to16(data);
-					writeToScreen('<span style="color: blue;">url: ' + url + ' </span>'); 
+					writeToScreen('<span style="color: green;">url: ' + url + ' </span>'); 
 				}
 				else{
 				    var data = new Uint8Array(evt.target.result, 8, evt.target.result.byteLength - 8);
 					//var data_sting =  new TextDecoder("utf-8").decode(data);
 					var data_sting = utf8to16(data);
-					writeToScreen('<span style="color: blue;">url: ' + data_sting + ' </span>');
+					writeToScreen('<span style="color: green;">url: ' + data_sting + ' </span>');
 				}
 			}
 		}
