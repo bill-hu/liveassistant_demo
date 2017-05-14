@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 /*
  * (C) Copyright 2011 Adobe Systems Incorporated. All Rights Reserved.
  *
@@ -714,9 +714,7 @@ function getExplorerTitle() {
 
 			var default_ss_start_pos = "0,0," + window.screen.width + "," + window.screen.height;
 			document.getElementById('ds_start_coord').value = default_ss_start_pos; 
-			//video=scr,doc,mov,non ; audio=mic,mov,non
-			document.getElementById('start_push_input').value = "0 video=scr audio=mic rtmp://127.0.0.1/live/1";
-			document.getElementById('start_record_input').value = "0 video=scr audio=mic";
+
 		}
 		
 	    function onJavaScriptBridgeCreated(id){  
@@ -854,154 +852,172 @@ function getExplorerTitle() {
 
 </head>
 <body>
- <table width="100" height="" border="0" align="left" cellpadding="0" cellspacing="0">
- <tr valign="top">
-    <td rowspan="4"></td>
-    <td height="327" colspan="3" bgcolor="#191919">
-      <table width="100" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
-              <tr>
-                <td width="61" colspan="4" bgcolor="#191919"><table width="100" border="0" cellspacing="0" cellpadding="0">
-                  <tr>
-                    <td width="93%"><table width="98%" border="0" cellpadding="0" cellspacing="0">
-   
+<table>
+<tr>
+         <td colspan="4" align="left" bgcolor="#191919"><img src="images/canvas.gif" alt="" name="index_r4_c3" width="1200" height="39" border="0" id="index_r4_c3" /></td>
+     </tr>
+<tr>
+   <td colspan="4" align="left" bgcolor="#191919">
+             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                 <tr>
+                     <td width="64%">
+                         <table width="65%" border="0" cellspacing="0" cellpadding="0">
+                             <tr>
+                                 <!-- Here goes the StrobeMediaPlayback -->
+                                 <td valign="top">
+                                     <!-- SWFObject's dynamic embed method replaces this alternative HTML content with Flash content when enough
+                                         JavaScript and Flash plug-in support is available. The div is initially hidden so that it doesn't show
+                                         when JavaScript is disabled.
+                                    -->
+                                     <div id="flashContentParent">
+                                         <div id="flashContent">
+                                             <p>To view this page ensure that Adobe Flash Player version 10.3.0 or greater is installed.</p>
+                                             <script type="text/javascript">
 
-                        <tr>
-                          <td colspan="4" align="left" bgcolor="#191919"><img src="images/canvas.gif" alt="" name="index_r4_c3" width="1200" height="39" border="0" id="index_r4_c3"/></td>
-                        </tr>
-                        
-                        <tr>
-                          <td colspan="4" align="left" bgcolor="#191919"><table width="100%" border="0" cellspacing="0" cellpadding="0">
-                            <tr>
-                              <td width="64%"><table width="65%" border="0" cellspacing="0" cellpadding="0">
-                                <tr>
-								<!-- Here goes the StrobeMediaPlayback -->
-                                  <td valign="top">
-        <!-- SWFObject's dynamic embed method replaces this alternative HTML content with Flash content when enough 
-			 JavaScript and Flash plug-in support is available. The div is initially hidden so that it doesn't show
-			 when JavaScript is disabled.
-		-->
-         <div id="flashContentParent">
-		 <div id="flashContent">
-        	<p>To view this page ensure that Adobe Flash Player version 10.3.0 or greater is installed.</p>
-			<script type="text/javascript"> 
-				var pageHost = ((document.location.protocol == "https:") ? "https://" :	"http://"); 
-				document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='" 
-								+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" ); 
-			</script> 
-        </div>
-		</div>
-			<noscript>
-				<a href="http://www.adobe.com/go/getflashplayer/" style="color:black"><img src="images/ERROR_getFlashPlayer.gif" width="640" height="377" /></a>
-		</noscript>				
-		 </td>
-        </tr>
-        </table> 	
-		</td>
-                              <td width="100"><table width="100" border="0" cellspacing="0" cellpadding="0">
-							     <tr width="323"><td><span class="style75">click on following buttons to test liveserver method</span></td><td>&nbsp;</td>
-								 <td>&nbsp;</td></tr>
-                                <tr>
-                                  <td width="800" height="300" background="images/upperright_03.gif">
-								  <table width="510" border="0" cellspacing="0" cellpadding="0">
-								  <tr>
-									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td colspan="3"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
-									  <td colspan="3" width="600" ><input id="rtmp_port"  readonly="readonly"/></td>
-				                    </tr>
-                                    <tr>
-									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-                                      <td colspan="3"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
-									  <td colspan="3"><input id="ss_start_input" size="45"/></td>
-									 <td colspan="3"><button type="button" id="ss_stop" onclick="javascript:onTestClick(this);">ss_stop</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="ds_start" onclick="javascript:onTestClick(this);">ds_start</button></td>
-                                     <td colspan="3"><input id="ds_start_coord" size="45"/><input id="ds_start_window_name" size="45"/></td>
-									 <td colspan="3"><button type="button" id="ds_stop" onclick="javascript:onTestClick(this);">ds_stop</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="get_mic" onclick="javascript:onTestClick(this);">get_mic</button></td>
-									  <td width="300" ><img src="images/spacer.gif" width="20" height="10" />
-									 <select width = "300" id="mics" name="mics" /></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="get_mic_vol" onclick="javascript:onTestClick(this);">get_mic_vol</button></td>
-                                     <td colspan="3"><input id="mic_vol" width="400"/></td>
-									 <td colspan="3"><button type="button" id="set_mic_vol" onclick="javascript:onTestClick(this);">set_mic_vol</button></td>
-                                    </tr>									
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
-									  <td colspan="3"></td>
-									 <td colspan="3"><button type="button" id="aud_stop" onclick="javascript:onTestClick(this);">aud_stop</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
-									 <td colspan="3"> <button type="button" id="mov_seek" onclick="javascript:onTestClick(this);">mov_seek</button><input id="duration" readonly="readonly" size="10"/></td>
-									 <td colspan="3"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									  <td colspan="3"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
-									   <td colspan="3"><input id="mov_pos" size="45"/></td>
-									 <td colspan="3"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="get_cam" onclick="javascript:onTestClick(this);">get_cam</button></td>
-									 <td width="300" ><img src="images/spacer.gif" width="20" height="10" />
-									 <select width = "300" id="cameras" name="cameras" />
-									 </td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
-                                     <td colspan="3"></td>
-									 <td colspan="3"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
-                                    <td colspan="3"><input id="start_push_input" size="45"/></td>
-                                    <td colspan="3"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
-                                    </tr>
-									<td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="start_record" onclick="javascript:onTestClick(this);">start_record</button></td>
-                                    <td colspan="3"><input id="start_record_input" size="45"/></td>
-                                    <td colspan="3"><button type="button" id="stop_record" onclick="javascript:onTestClick(this);">stop_record</button></td>
-                                    </tr>
-									<tr>
-                                     <td width="35" colspan="2"><img src="images/spacer.gif" width="20" height="10" /></td>
-									 <td colspan="3"><button type="button" id="get_videoparam" onclick="javascript:onTestClick(this);">get_videoparam</button></td>
-									 <td><select width = "100" id="sources" name="sources" /><option value ="scr">scr</option><option value ="scr">doc</option>
-									  <option value ="scr">mov</option><option value ="scr">cam</option><<input id="videoparam" size="36"/></td>
-								    <td colspan="5"><button type="button" id="set_videoparam" onclick="javascript:onTestClick(this);">set_videoparam</button></td>
-                                    </tr>
-                                  </table></td>
-                                </tr>
-                              </td>
-                            </tr>
-							</tr>
-                          </table></td>
-                        </tr>
-                    </table></td>
-                    <td width="7%">&nbsp;</td>
-                  </tr>
-                </table></td>
-              </tr>
-           </table></td>
-        </tr>
-      </table></td>
-   </tr>
-  <tr>
-    <td colspan="2" valign="top" bgcolor="#191919"><table width="100" border="0" align="left" cellpadding="0" cellspacing="0">
-        <!-- fwtable fwsrc="080715_fms_splash_fireworks.png" fwbase="index.gif" fwstyle="Dreamweaver" fwdocid = "1526025482" fwnested="0" -->
+				var pageHost = ((document.location.protocol == "https:") ? "https://" :	"http://");
+				document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='"
+								+ pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" );
+                                             </script>
+                                         </div>
+                                     </div>
+                                     <noscript>
+                                         <a href="http://www.adobe.com/go/getflashplayer/" style="color:black"><img src="images/ERROR_getFlashPlayer.gif" width="640" height="377" /></a>
+                                     </noscript>
+                                 </td>
+                             </tr>
+                         </table>
+                     </td>
+                     <td>
+                         <table width="100" border="0" cellspacing="0" cellpadding="0">
+                             <tr>
+                                 <td><span class="style75">click on following buttons to test liveserver method</span></td>
+                                 <td>&nbsp;</td>
+                                 <td>&nbsp;</td>
+                             </tr>
+                             <tr>
+                                 <td background="images/upperright_03.gif">
+                                     <table border="0" cellspacing="0" cellpadding="0">
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
+                                             <td colspan="4"><input id="rtmp_port" readonly="readonly" /></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="ss_start" onclick="onTestClick(this)">ss_start</button></td>
+                                             <td colspan="4"><input id="ss_start_input" size="45" /></td>
+                                             <td colspan="2"><button type="button" id="ss_stop" onclick="javascript:onTestClick(this);">ss_stop</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="ds_start" onclick="javascript:onTestClick(this);">ds_start</button></td>
+                                             <td colspan="4"><input id="ds_start_coord" size="45" /><input id="ds_start_window_name" size="45" /></td>
+                                             <td colspan="2"><button type="button" id="ds_stop" onclick="javascript:onTestClick(this);">ds_stop</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="get_mic" onclick="javascript:onTestClick(this);">get_mic</button></td>
+                                             <td colspan="4">
+                                                 <img src="images/spacer.gif" width="5" height="10" />
+                                                 <select width="300" id="mics" name="mics" />
+                                             </td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
+                                             <td colspan="4"></td>
+                                             <td colspan="2"><button type="button" id="aud_stop" onclick="javascript:onTestClick(this);">aud_stop</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="get_mic_vol" onclick="javascript:onTestClick(this);">get_mic_vol</button></td>
+                                             <td colspan="4"><input id="mic_vol" width="400" /></td>
+                                             <td colspan="2"><button type="button" id="set_mic_vol" onclick="javascript:onTestClick(this);">set_mic_vol</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
+                                             <td colspan="4"> <input id="duration" readonly="readonly" size="10" /></td>
+                                             <td colspan="2"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
+                                             <td colspan="4"><button type="button" id="mov_seek" onclick="javascript:onTestClick(this);">mov_seek</button><input id="mov_pos" size="10" /></td>
+                                             <td colspan="2"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="get_cam" onclick="javascript:onTestClick(this);">get_cam</button></td>
+                                             <td colspan="4">
+                                                 <img src="images/spacer.gif" width="5" height="10" />
+                                                 <select width="300" id="cameras" name="cameras" />
+                                             </td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
+                                             <td colspan="4"></td>
+                                             <td colspan="2"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="start_push" onclick="javascript:onTestClick(this);">start_push</button></td>
+                                             <td colspan="4">
+                                                 <input id="start_push_input" size="50" list="start_push_sample_list" /><datalist id="start_push_sample_list">
+                                                     <option value="0 video=scr audio=mic rtmp://127.0.0.1/live/0"></option>
+                                                     <option value="1 video=doc audio=mic rtmp://127.0.0.1/live/1"></option>
+                                                     <option value="2 video=cam audio=mic rtmp://127.0.0.1/live/2"></option>
+                                                     <option value="3 video=mov audio=mov rtmp://127.0.0.1/live/3"></option>
+                                                     <option value="4 video=non audio=mov rtmp://127.0.0.1/live/4"></option>
+                                                     <option value="5 video=doc audio=non rtmp://127.0.0.1/live/5"></option>
+                                                     <option value="5 video=doc audio=mov rtmp://127.0.0.1/live/6"></option>
+                                                 </datalist>
+                                             </td>
+                                             <td colspan="2"><button type="button" id="stop_push" onclick="javascript:onTestClick(this);">stop_push</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="start_record" onclick="javascript:onTestClick(this);">start_record</button></td>
+                                             <td colspan="4">
+                                                 <input id="start_record_input" size="45" list="start_record_sample_list" />
+                                                 <datalist id="start_record_sample_list">
+                                                     <option value="0 video=scr audio=mic" />
+                                                     <option value="1 video=doc audio=mic" />
+                                                     <option value="2 video=cam audio=mic" />
+                                                     <option value="3 video=mov audio=mov" />
+                                                 </datalist>
+                                             </td>
+                                             <td colspan="2"><button type="button" id="stop_record" onclick="javascript:onTestClick(this);">stop_record</button></td>
+                                         </tr>
+                                         <tr>
+                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
+                                             <td colspan="2"><button type="button" id="get_videoparam" onclick="javascript:onTestClick(this);">get_videoparam</button></td>
+                                             <td colspan="1">
+                                                 <select id="sources" name="sources">
+                                                     <option value="scr">scr</option>
+                                                     <option value="doc">doc</option>
+                                                     <option value="mov">mov</option>
+                                                     <option value="cam">cam</option>
+                                                 </select>
+                                             </td>
+                                             <td colspan="3"><input id="videoparam" size="36" /></td>
+                                             <td colspan="2"><button type="button" id="set_videoparam" onclick="javascript:onTestClick(this);">set_videoparam</button></td>
+                                         </tr>
+                                     </table>
+                                 </td>
+                             </tr>
+
+
+
+                         </table>
+                     </td>
+                 </tr>
+             </table>
+  </td>
+</tr>
+<tr>
+    <td colspan="3" valign="top" bgcolor="#191919"><table width="100" border="0" align="left" cellpadding="0" cellspacing="0">
         <tr>
           <td colspan="3" valign="top"><img src="images/spacer.gif" width="55" height="10" /></td>
         </tr>
@@ -1011,7 +1027,7 @@ function getExplorerTitle() {
               <td><span class="style69">Play RTMP stream</span></td>
             </tr>
             <tr>
-              <td bgcolor="#666666"><img src="images/spacer.gif" width="20" height="3" /></td>
+              <td bgcolor="#666666"><img src="images/spacer.gif" width="5" height="3" /></td>
             </tr>
             <tr>
               <td><img src="images/spacer.gif" width="55" height="10" /></td>
@@ -1028,8 +1044,8 @@ function getExplorerTitle() {
                   <td align="left"><input name="inputURL" type="text" id="inputURL" size="80" maxlength="80" /></td>
                   <td width="42%" align="left"><table width="100" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                      <td width="5%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
-                      <td width="5%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
+                      <td width="5%" align="left"><img src="images/spacer.gif" width="5" height="10" /></td>
+                      <td width="5%" align="left"><img src="images/spacer.gif" width="5" height="10" /></td>
                       <td width="27%" align="left"><a id="playBtn" onclick="javascript:playStream();"><img src="images/playstream_10.gif" width="104" height="25" /></a></td>
                       <td align="left">&nbsp;</td>
                     </tr>
@@ -1040,13 +1056,15 @@ function getExplorerTitle() {
               </table></td>
             </tr>
           </table></td>
-        </tr>
-		     <td colspan="3" valign="top"><table width="87%" border="0" cellspacing="0" cellpadding="0">
+ </tr>
+<tr>
+   <td colspan="3" valign="top">
+    <table width="87%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td><span class="style69">Connect Xuedianyun LiveServer</span></td>
             </tr>
             <tr>
-              <td bgcolor="#666666"><img src="images/spacer.gif" width="20" height="3" /></td>
+              <td bgcolor="#666666"><img src="images/spacer.gif" width="5" height="3" /></td>
             </tr>
             
             <tr>
@@ -1064,7 +1082,7 @@ function getExplorerTitle() {
                   <td align="left"><input name="websocketURL" type="text" id="websocketURL" size="80" maxlength="80" /></td>
                   <td width="42%" align="left"><table width="100" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                  <td width="2%" align="left"><img src="images/spacer.gif" width="10" height="10" /></td>
+                  <td width="2%" align="left"><img src="images/spacer.gif" width="5" height="10" /></td>
                       <td width="27%" align="left"><a id="connectBtn" onclick="javascript:connectLiveServ();"><img src="images/connect.gif" width="104" height="25" /></a></td>
                       <td align="left">&nbsp;</td>
                       <td width="27%" align="left"><a id="disconnectBtn" onclick="javascript:disconnectLiveServ();"><img src="images/disconnect.gif" width="104" height="25" />  
@@ -1075,8 +1093,9 @@ function getExplorerTitle() {
                   </tr>
               </table></td>
             </tr>
-          </table></td>
-        </tr>
+          </table>
+   </td>
+</tr>
 </table>
 <div id = output />
 </body>
