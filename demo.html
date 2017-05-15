@@ -332,6 +332,13 @@ a:active {
 				else if(11 == result){//ss_start success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ss");
 				}
+				else if(24 <= result && 26 >= result){
+				    if(data_len >= 4){
+				        var version = dv.getUint32(8, true);
+				        document.getElementById('ss_version_result').value = version.toString();
+				        writeToScreen('<span style="color: green;">result: ' + version + ' </span>');
+				    }
+				}
 				else if(55 == result){//ds_start success
 					playRTMPStream("rtmp://127.0.0.1:" + rtmp_port + "/live/ds");
 				}
@@ -513,6 +520,9 @@ a:active {
 			}
 			else if(cmdName == "ss_stop"){
 			    cmd.type = 7;
+			}
+			else if(cmdName == "ss_version"){
+			    cmd.type = 14;
 			}
 			else if(cmdName == "get_mic"){
 				cmd.type = 26;
@@ -702,7 +712,7 @@ function getExplorerTitle() {
         {
 			output = document.getElementById("output");
 			
-			document.getElementById( 'websocketURL' ).value = "ws://127.0.0.1:8090";
+			document.getElementById( 'websocketURL' ).value = "ws://127.0.0.1:6080";
 		
  			document.getElementById( 'inputURL' ).value = queryParameters['source'];
 			
@@ -858,9 +868,9 @@ function getExplorerTitle() {
      </tr>
 <tr>
    <td colspan="4" align="left" bgcolor="#191919">
-             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+             <table width="100%" border="0" cellspacing="10" cellpadding="0">
                  <tr>
-                     <td width="64%">
+                     <td >
                          <table width="65%" border="0" cellspacing="0" cellpadding="0">
                              <tr>
                                  <!-- Here goes the StrobeMediaPlayback -->
@@ -896,11 +906,13 @@ function getExplorerTitle() {
                              </tr>
                              <tr>
                                  <td background="images/upperright_03.gif">
-                                     <table border="0" cellspacing="0" cellpadding="0">
+                                     <table border="0" cellspacing="4" cellpadding="0">
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="get_rtmp_port" onclick="onTestClick(this)">get_rtmp_port</button></td>
-                                             <td colspan="4"><input id="rtmp_port" readonly="readonly" /></td>
+                                             <td colspan="1"><input id="rtmp_port" readonly="readonly" size="10" /></td>
+                                             <td colspan="2" align="center"><button type="button" id="ss_version" onclick="onTestClick(this)">ss_version</button></td>
+                                             <td colspan="1"><input id="ss_version_result" readonly="readonly" size="10"/></td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
@@ -919,46 +931,39 @@ function getExplorerTitle() {
                                              <td colspan="2"><button type="button" id="get_mic" onclick="javascript:onTestClick(this);">get_mic</button></td>
                                              <td colspan="4">
                                                  <img src="images/spacer.gif" width="5" height="10" />
-                                                 <select width="300" id="mics" name="mics" />
+                                                 <select id="mics" name="mics"/>
                                              </td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="aud_start" onclick="javascript:onTestClick(this);">aud_start</button></td>
-                                             <td colspan="4"></td>
                                              <td colspan="2"><button type="button" id="aud_stop" onclick="javascript:onTestClick(this);">aud_stop</button></td>
-                                         </tr>
-                                         <tr>
-                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
-                                             <td colspan="2"><button type="button" id="get_mic_vol" onclick="javascript:onTestClick(this);">get_mic_vol</button></td>
-                                             <td colspan="4"><input id="mic_vol" width="400" /></td>
-                                             <td colspan="2"><button type="button" id="set_mic_vol" onclick="javascript:onTestClick(this);">set_mic_vol</button></td>
+                                             <td colspan="1" align="center"><button type="button" id="get_mic_vol" onclick="javascript:onTestClick(this);">get_mic_vol</button></td>
+                                             <td colspan="1"><input id="mic_vol" size="10" /></td>
+                                             <td colspan="1"><button type="button" id="set_mic_vol" onclick="javascript:onTestClick(this);">set_mic_vol</button></td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="mov_start" onclick="javascript:onTestClick(this);">mov_start</button></td>
-                                             <td colspan="4"> <input id="duration" readonly="readonly" size="10" /></td>
-                                             <td colspan="2"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
+                                             <td colspan="2"> <input id="duration" readonly="readonly" size="10" /></td>
+                                             <td colspan="1" align="center"><button type="button" id="mov_stop" onclick="javascript:onTestClick(this);">mov_stop</button></td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
-                                             <td colspan="2"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
-                                             <td colspan="4"><button type="button" id="mov_seek" onclick="javascript:onTestClick(this);">mov_seek</button><input id="mov_pos" size="10" /></td>
-                                             <td colspan="2"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
+                                             <td colspan="2"><button type="button" id="mov_seek" onclick="javascript:onTestClick(this);">mov_seek</button></td>
+                                             <td colspan="2"><input id="mov_pos" size="10" /></td>
+                                             <td colspan="1" align="center"><button type="button" id="mov_pause" onclick="javascript:onTestClick(this);">mov_pause</button></td>
+                                            <td colspan="1"><button type="button" id="mov_resume" onclick="javascript:onTestClick(this);">mov_resume</button></td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="get_cam" onclick="javascript:onTestClick(this);">get_cam</button></td>
-                                             <td colspan="4">
+                                             <td colspan="3">
                                                  <img src="images/spacer.gif" width="5" height="10" />
                                                  <select width="300" id="cameras" name="cameras" />
                                              </td>
-                                         </tr>
-                                         <tr>
-                                             <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
-                                             <td colspan="2"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
-                                             <td colspan="4"></td>
-                                             <td colspan="2"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
+                                             <td colspan="1"><button type="button" id="cam_start" onclick="javascript:onTestClick(this);">cam_start</button></td>
+                                             <td colspan="1"><button type="button" id="cam_stop" onclick="javascript:onTestClick(this);">cam_stop</button></td>
                                          </tr>
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
@@ -980,7 +985,7 @@ function getExplorerTitle() {
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="start_record" onclick="javascript:onTestClick(this);">start_record</button></td>
                                              <td colspan="4">
-                                                 <input id="start_record_input" size="45" list="start_record_sample_list" />
+                                                 <input id="start_record_input" size="50" list="start_record_sample_list" />
                                                  <datalist id="start_record_sample_list">
                                                      <option value="0 video=scr audio=mic" />
                                                      <option value="1 video=doc audio=mic" />
@@ -993,7 +998,7 @@ function getExplorerTitle() {
                                          <tr>
                                              <td colspan="1"><img src="images/spacer.gif" width="5" height="10" /></td>
                                              <td colspan="2"><button type="button" id="get_videoparam" onclick="javascript:onTestClick(this);">get_videoparam</button></td>
-                                             <td colspan="1">
+                                             <td colspan="1" align="center">
                                                  <select id="sources" name="sources">
                                                      <option value="scr">scr</option>
                                                      <option value="doc">doc</option>
